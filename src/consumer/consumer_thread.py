@@ -1,11 +1,7 @@
-from src.consumer import Consumer
+from consumer import Consumer
 
 import threading
 import logging
-
-import os
-if "PYTEST_CURRENT_TEST" in os.environ:
-    print ("pytest run")
 
 logger = logging.getLogger(__name__)
 

@@ -1,66 +1,75 @@
-from src.rabbitmq import Config
-from src.util import parse_utf_8
-from src.process import Process
+from rabbitmq import Config
+from cipher import Encryptor
+from process import Process
 
 import pika
 import logging
+import traceback
+from time import sleep
 
 logger = logging.getLogger(__name__)
 
 
 class Consumer:
     def __init__(self):
-        self.__channel = None
+        pass
 
     def start(self) -> bool:
         if not self.__make_connection():
             logger.error("Could not make consumer connection")
             return False
-        if not self.__start_consuming():
-            logger.error("Could not start consumer")
-            return False
 
         return True
 
     @staticmethod
-    def __callback(channel, method, properties, body) -> None:
-        message = parse_utf_8(body)
-        logger.info("Consumer received '{}'".format(message))
+    def __on_message(channel, method, properties, body) -> bool:
+        try:
+            message = Encryptor().decrypt(body)
+            print(message)
+            if not message:
+                logger.error("Could not decrypt the message!")
+                return False
 
-        process = Process()
-        process.process(message)
+            logger.info("Consumer received '{}'".format(message))
+
+            process = Process()
+            return process.process(message)
+        except Exception as e:
+            traceback.print_exc()
+            logger.debug("An exception was thrown while handling incoming message")
 
     def __make_connection(self) -> bool:
         result = False
-        try:
-            connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host=Config.host))
+        while True:
+            try:
+                connection = pika.BlockingConnection(
+                    pika.ConnectionParameters(host=Config.host))
 
-            channel = connection.channel()
-            channel.queue_bind(queue=Config.queue,
-                               exchange=Config.topic_exchange_name,
-                               routing_key=Config.routing_key)
-            channel.basic_consume(Config.queue, self.__callback,
-                                  auto_ack=True)
+                channel = connection.channel()
+                channel.queue_bind(queue=Config.queue,
+                                   exchange=Config.topic_exchange_name,
+                                   routing_key=Config.routing_key)
+                channel.basic_consume(Config.queue, self.__on_message,
+                                      auto_ack=True)
 
-            self.__channel = channel
+                logger.info("Consumer is listening...")
+                channel.start_consuming()
 
-            result = True
-        except Exception as e:
-            logger.debug("An exception was thrown while making the consumer connection")
-            logger.debug(e)
-
-        return result
-
-    def __start_consuming(self) -> bool:
-        result = False
-        try:
-            logger.info("Consumer is listening...")
-            self.__channel.start_consuming()
-
-            result = True
-        except Exception as e:
-            logger.debug("An exception was thrown while starting the consumer")
-            logger.debug(e)
+                result = True
+            except pika.exceptions.ChannelClosedByBroker:
+                logger.debug("Channel was closed by broker, retrying...")
+                sleep(5)
+                continue
+            except pika.exceptions.ConnectionClosedByBroker:
+                logger.debug("Connection was closed by broker, retrying...")
+                sleep(5)
+                continue
+            except pika.exceptions.AMQPConnectionError:
+                logger.debug("AMQP Connection error occured, retrying...")
+                sleep(10)
+                continue
+            except Exception as e:
+                traceback.print_exc()
+                logger.debug("An exception was thrown while making the consumer connection")
 
         return result

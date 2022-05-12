@@ -1,3 +1,8 @@
 .idea/
 log/
 **/__pycache__/
+build/
+dist/
+*.spec
+*.log
+*.pem

@@ -1,5 +1,5 @@
-from src.consumer import ConsumerThread
-from src.publisher import Publisher
+from consumer import ConsumerThread
+from publisher import Publisher
 
 import time
 

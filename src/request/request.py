@@ -1,9 +1,10 @@
-from src.rabbitmq import Config
-from src.signal import Signal
-from src.publisher import Publisher
+from rabbitmq import Config
+from signal import Signal
+from publisher import Publisher
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class Request:
     def __init__(self, signal_type, signal_id):

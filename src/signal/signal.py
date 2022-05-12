@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Signal():
+class Signal:
     def __init__(self, type):
         self.__type = type
 

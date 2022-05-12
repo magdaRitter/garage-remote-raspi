@@ -13,7 +13,11 @@ class SignalType(Enum):
             return SignalType.GATE
 
     def to_str(self) -> str:
-        if self.GARAGE:
-            return "GARAGE"
-        if self.GATE:
-            return "GATE"
+        result = "ERROR"
+
+        if SignalType.GARAGE == self:
+            result = "GARAGE"
+        if SignalType.GATE == self:
+            result = "GATE"
+
+        return result

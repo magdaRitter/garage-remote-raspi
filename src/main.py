@@ -1,9 +1,13 @@
-#!/usr/bin/env python3
-
-from src.consumer import ConsumerThread
+from consumer import ConsumerThread
 import logging
+import sys
 
-logging.basicConfig(filename="../log/garage-remote-raspi.log", level=logging.DEBUG, format='%(asctime)s:%(name)s:%(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s:%(name)s:%(message)s',
+                    handlers=[
+                        # logging.FileHandler("../log/debug.log"),
+                        logging.StreamHandler(sys.stdout)
+                    ]
+                    )
 logging.getLogger("pika").propagate = False
 
 

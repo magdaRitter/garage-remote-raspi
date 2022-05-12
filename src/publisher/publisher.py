@@ -1,4 +1,5 @@
-from src.rabbitmq import Config
+from rabbitmq import Config
+from cipher import Encryptor
 import pika
 import logging
 
@@ -35,7 +36,12 @@ class Publisher:
             return result
 
         try:
-            self.__channel.basic_publish(Config.topic_exchange_name, Config.routing_key, body=message)
+            body = Encryptor().encrypt(message)
+            if not body:
+                logger.error("Could not encrypt the message!")
+                return False
+
+            self.__channel.basic_publish(Config.topic_exchange_name, Config.routing_key, body=body)
             logger.info("Published message: " + message)
 
             self.__connection.close()

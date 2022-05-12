@@ -1,4 +1,4 @@
-from src.request import Request
+from request import Request
 
 import threading
 import logging
