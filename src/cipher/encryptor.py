@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 class Encryptor:
     def __init__(self):
-        self.__decryption_private_key_path = 'keys/decryption-private-key.pem'
-        self.__encryption_public_key_path = 'keys/encryption-public-key.pem'
+        self.__decryption_private_key_path = '/home/pi/garage-remote-raspi/src/keys/decryption-private-key.pem'
+        self.__encryption_public_key_path = '/home/pi/garage-remote-raspi/src/keys/encryption-public-key.pem'
 
     def decrypt(self, ciphertext):
         return self.__decrypt(ciphertext)

@@ -1,5 +1,6 @@
+import traceback
 from rabbitmq import Config
-from signal import Signal
+from signal import SignalTrigger
 from publisher import Publisher
 import logging
 
@@ -25,10 +26,10 @@ class Request:
         status = False
 
         try:
-            signal = Signal(self.__signal_type)
-            status = signal.trigger()
+            status = SignalTrigger().trigger(self.__signal_type)
         except Exception as e:
             logger.debug("An exception was thrown while triggering a signal with id {}".format(self.__signal_id))
+            traceback.print_exc()
 
         response = "{}_{}_{}_{}".format(Config.RESPONSE_KEY, self.__signal_type.to_str(), self.__signal_id, status)
 
