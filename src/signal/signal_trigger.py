@@ -15,8 +15,25 @@ class SignalTrigger:
         logger.debug("Signal for {} is being fired".format(type))
         result = False
 
+        if SignalType.BOTH == type:
+            result = (self._fire_garage_signal() and self._fire_gate_signal())
+        if SignalType.GARAGE == type:
+            result = self._fire_garage_signal()
+        if SignalType.GATE == type:
+            result = self._fire_gate_signal()
+
+        return result
+
+    def _fire_garage_signal(self) -> bool:
+        return self.__fire_signal(16)
+    
+    def _fire_gate_signal(self) -> bool:
+        return self.__fire_signal(20)
+
+    def __fire_signal(self, led_signal) -> bool:
+        result = False
+
         try:
-            led_signal = 16 if SignalType.GARAGE == type else 20
             remotePin = LED(led_signal)
             remotePin.on()
             sleep(1)
