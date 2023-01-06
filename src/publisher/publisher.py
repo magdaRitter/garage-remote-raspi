@@ -14,7 +14,12 @@ class Publisher:
     def __make_connection(self) -> bool:
         result = False
         try:
-            connection = pika.BlockingConnection(pika.ConnectionParameters(Config.host))
+            connection = pika.BlockingConnection(pika.ConnectionParameters(Config.host,
+                                                 port=Config.port,
+                                                 virtual_host=Config.virtualHost,
+                                                 credentials=pika.PlainCredentials(username=Config.username,
+                                                                                   password=Config.password)
+                                                 ))
             channel = connection.channel()
             channel.queue_declare(queue=Config.queue)
 

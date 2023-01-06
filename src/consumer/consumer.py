@@ -43,7 +43,11 @@ class Consumer:
         while True:
             try:
                 connection = pika.BlockingConnection(
-                    pika.ConnectionParameters(host=Config.host))
+                    pika.ConnectionParameters(host=Config.host,
+                                              port=Config.port,
+                                              virtual_host=Config.virtualHost,
+                                              credentials=pika.PlainCredentials(username=Config.username, password=Config.password)
+                                              ))
 
                 channel = connection.channel()
                 channel.queue_bind(queue=Config.queue,
